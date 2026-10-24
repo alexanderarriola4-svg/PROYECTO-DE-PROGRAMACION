@@ -1,0 +1,38 @@
+// Diagrama entidad-relacion - base data/turnos.db
+// Generar imagen: dot -Tpng entidad_relacion.dot -o entidad_relacion.png
+digraph ER {
+    graph [rankdir=LR, fontname="Helvetica", bgcolor="white", pad=0.4, nodesep=0.8, ranksep=1.4,
+           label="Diagrama entidad-relacion - data/turnos.db", labelloc=t, fontsize=18];
+    node  [shape=plain, fontname="Helvetica", fontsize=11];
+    edge  [fontname="Helvetica", fontsize=10, color="#444444"];
+
+    clientes [label=<<table border="1" cellborder="1" cellspacing="0" cellpadding="5">
+        <tr><td colspan="3" bgcolor="#7aa7d9"><font color="white"><b>clientes</b></font></td></tr>
+        <tr><td><b>PK</b></td><td port="codigo" align="left"><b>codigo</b></td><td align="left">INTEGER  CHECK &gt; 0</td></tr>
+        <tr><td></td><td align="left">nombre</td><td align="left">TEXT  NOT NULL</td></tr>
+        <tr><td></td><td align="left">telefono</td><td align="left">TEXT  NOT NULL  (8 digitos)</td></tr>
+        <tr><td></td><td align="left">activo</td><td align="left">INTEGER  0/1  DEFAULT 1</td></tr>
+        </table>>];
+
+    servicios [label=<<table border="1" cellborder="1" cellspacing="0" cellpadding="5">
+        <tr><td colspan="3" bgcolor="#77b877"><font color="white"><b>servicios</b></font></td></tr>
+        <tr><td><b>PK</b></td><td port="codigo" align="left"><b>codigo</b></td><td align="left">INTEGER  CHECK &gt; 0</td></tr>
+        <tr><td></td><td align="left">nombre</td><td align="left">TEXT  NOT NULL</td></tr>
+        <tr><td></td><td align="left">activo</td><td align="left">INTEGER  0/1  DEFAULT 1</td></tr>
+        </table>>];
+
+    turnos [label=<<table border="1" cellborder="1" cellspacing="0" cellpadding="5">
+        <tr><td colspan="3" bgcolor="#d98a8a"><font color="white"><b>turnos</b></font></td></tr>
+        <tr><td><b>PK</b></td><td align="left"><b>numero</b></td><td align="left">INTEGER  AUTOINCREMENT</td></tr>
+        <tr><td><b>FK</b></td><td port="cli" align="left">codigo_cliente</td><td align="left">INTEGER  NOT NULL</td></tr>
+        <tr><td><b>FK</b></td><td port="serv" align="left">codigo_servicio</td><td align="left">INTEGER  NOT NULL</td></tr>
+        <tr><td></td><td align="left">fecha_generacion</td><td align="left">TEXT  NOT NULL</td></tr>
+        <tr><td></td><td align="left">estado</td><td align="left">TEXT  PENDIENTE | ATENDIDO | CANCELADO</td></tr>
+        <tr><td></td><td align="left">fecha_atencion</td><td align="left">TEXT  NULL</td></tr>
+        <tr><td></td><td align="left">fecha_cancelacion</td><td align="left">TEXT  NULL</td></tr>
+        <tr><td colspan="3" align="left"><font point-size="9">UNIQUE (codigo_cliente) WHERE estado = 'PENDIENTE'<br align="left"/>-&gt; un solo turno pendiente por cliente<br align="left"/></font></td></tr>
+        </table>>];
+
+    clientes:codigo -> turnos:cli  [dir=both, arrowtail=teetee, arrowhead=crowodot, label="  solicita  \n 1 : 0..N "];
+    servicios:codigo -> turnos:serv [dir=both, arrowtail=teetee, arrowhead=crowodot, label="  se asigna a  \n 1 : 0..N "];
+}

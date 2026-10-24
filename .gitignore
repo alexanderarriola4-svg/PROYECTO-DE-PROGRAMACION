@@ -1,0 +1,9 @@
+target/
+*.class
+.idea/
+*.iml
+.DS_Store
+# La base data/turnos.db SÍ se versiona (debe entregarse con los datos iniciales).
+data/*.db-journal
+data/*.db-wal
+data/*.db-shm

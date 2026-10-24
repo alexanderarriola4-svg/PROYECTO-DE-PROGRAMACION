@@ -1,0 +1,14 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Atención de Turnos",
+            "request": "launch",
+            "mainClass": "com.oficina.turnos.Main",
+            "projectName": "atencion-turnos",
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal"
+        }
+    ]
+}

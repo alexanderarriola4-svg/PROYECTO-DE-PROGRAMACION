@@ -1,0 +1,225 @@
+// Diagrama UML de clases - Sistema de Atencion de Turnos
+// Generar imagen: dot -Tpng uml_clases.dot -o uml_clases.png
+digraph UML {
+    graph [rankdir=TB, fontname="Helvetica", fontsize=12, nodesep=0.35, ranksep=0.7, splines=ortho, bgcolor="white", pad=0.3,
+           label="Diagrama UML de clases - Sistema de Atencion de Turnos (com.oficina.turnos)", labelloc=t, fontsize=18];
+    node  [shape=plain, fontname="Helvetica", fontsize=10];
+    edge  [fontname="Helvetica", fontsize=9, color="#444444"];
+
+    Main [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="#fff7d6">
+        <tr><td><b>Main</b></td></tr><hr/>
+        <tr><td align="left">+ main(args: String[]): void</td></tr></table>>];
+
+    subgraph cluster_vista {
+        label="vista (V)"; style="rounded,filled"; fillcolor="#eef6ff"; color="#7aa7d9";
+        MenuBase [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="white">
+            <tr><td><i>&lt;&lt;abstract&gt;&gt;</i><br/><b><i>MenuBase</i></b></td></tr><hr/>
+            <tr><td align="left"># entrada: EntradaConsola</td></tr><hr/>
+            <tr><td align="left"># ejecutarSeguro(accion: Runnable): void</td></tr>
+            <tr><td align="left"># opcionInvalida(opcion: int): void</td></tr></table>>];
+        MenuPrincipal [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="white">
+            <tr><td><b>MenuPrincipal</b></td></tr><hr/>
+            <tr><td align="left">+ NOMBRE_OFICINA: String</td></tr><hr/>
+            <tr><td align="left">+ iniciar(): void</td></tr></table>>];
+        VistaClientes [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="white">
+            <tr><td><b>VistaClientes</b></td></tr><hr/>
+            <tr><td align="left">+ mostrarMenu(): void</td></tr></table>>];
+        VistaServicios [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="white">
+            <tr><td><b>VistaServicios</b></td></tr><hr/>
+            <tr><td align="left">+ mostrarMenu(): void</td></tr></table>>];
+        VistaTurnos [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="white">
+            <tr><td><b>VistaTurnos</b></td></tr><hr/>
+            <tr><td align="left">+ generarTurno() / atenderSiguiente()</td></tr>
+            <tr><td align="left">+ cancelarTurno() / consultarPendientes()</td></tr>
+            <tr><td align="left">+ consultarAtendidos() / consultarCancelados()</td></tr>
+            <tr><td align="left">+ historialCliente() / resumenPorServicio()</td></tr></table>>];
+        EntradaConsola [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="white">
+            <tr><td><b>EntradaConsola</b></td></tr><hr/>
+            <tr><td align="left">- scanner: Scanner</td></tr><hr/>
+            <tr><td align="left">+ leerTexto(msg): String</td></tr>
+            <tr><td align="left">+ leerEntero(msg): int</td></tr>
+            <tr><td align="left">+ confirmar(msg): boolean</td></tr></table>>];
+        Pantalla [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="white">
+            <tr><td><b>Pantalla</b></td></tr><hr/>
+            <tr><td align="left">+ titulo / exito / error / info</td></tr>
+            <tr><td align="left">+ tablaClientes / tablaPendientes ...</td></tr></table>>];
+    }
+
+    subgraph cluster_logica {
+        label="logica (C - reglas de negocio)"; style="rounded,filled"; fillcolor="#eefbee"; color="#77b877";
+        GestorClientes [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="white">
+            <tr><td><b>GestorClientes</b></td></tr><hr/>
+            <tr><td align="left">- clienteDAO: ClienteDAO</td></tr>
+            <tr><td align="left">- turnoDAO: TurnoDAO</td></tr>
+            <tr><td align="left">- arbol: ArbolClientes</td></tr><hr/>
+            <tr><td align="left">+ cargarArbolDesdeBD(): int</td></tr>
+            <tr><td align="left">+ registrar(cod, nombre, tel): Cliente</td></tr>
+            <tr><td align="left">+ listar(): List&lt;Cliente&gt;</td></tr>
+            <tr><td align="left">+ buscar(cod): Cliente</td></tr>
+            <tr><td align="left">+ actualizar(cod, nombre, tel): Cliente</td></tr>
+            <tr><td align="left">+ activar(cod) / desactivar(cod)</td></tr></table>>];
+        GestorServicios [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="white">
+            <tr><td><b>GestorServicios</b></td></tr><hr/>
+            <tr><td align="left">- servicioDAO: ServicioDAO</td></tr>
+            <tr><td align="left">- turnoDAO: TurnoDAO</td></tr><hr/>
+            <tr><td align="left">+ registrar(cod, nombre): Servicio</td></tr>
+            <tr><td align="left">+ listar() / listarActivos()</td></tr>
+            <tr><td align="left">+ buscar(cod) / actualizar(cod, nombre)</td></tr>
+            <tr><td align="left">+ activar(cod) / desactivar(cod)</td></tr></table>>];
+        GestorTurnos [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="white">
+            <tr><td><b>GestorTurnos</b></td></tr><hr/>
+            <tr><td align="left">- turnoDAO: TurnoDAO</td></tr>
+            <tr><td align="left">- cola: ColaTurnos</td></tr><hr/>
+            <tr><td align="left">+ reconstruirCola(): int</td></tr>
+            <tr><td align="left">+ generar(codCli, codServ): Turno</td></tr>
+            <tr><td align="left">+ atenderSiguiente(): Optional&lt;Turno&gt;</td></tr>
+            <tr><td align="left">+ cancelar(numero): Turno</td></tr>
+            <tr><td align="left">+ pendientes() / atendidos() / cancelados()</td></tr>
+            <tr><td align="left">+ historial(codCli): List&lt;Turno&gt;</td></tr></table>>];
+        GestorReportes [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="white">
+            <tr><td><b>GestorReportes</b></td></tr><hr/>
+            <tr><td align="left">+ resumenPorServicio(): List&lt;ResumenServicio&gt;</td></tr>
+            <tr><td align="left">+ totalGeneral(filas): ResumenServicio</td></tr>
+            <tr><td align="left">+ detallar(turnos): List&lt;TurnoDetalle&gt;  (HashMap)</td></tr></table>>];
+        Validador [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="white">
+            <tr><td><b>Validador</b></td></tr><hr/>
+            <tr><td align="left">+ validarCodigo / validarTextoObligatorio</td></tr>
+            <tr><td align="left">+ validarTelefono</td></tr></table>>];
+        ReglaNegocioException [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="white">
+            <tr><td><b>ReglaNegocioException</b></td></tr><hr/>
+            <tr><td align="left">extends RuntimeException</td></tr></table>>];
+    }
+
+    subgraph cluster_estructuras {
+        label="estructuras (propias)"; style="rounded,filled"; fillcolor="#fff0f0"; color="#d98a8a";
+        ColaTurnos [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="white">
+            <tr><td><b>ColaTurnos</b></td></tr><hr/>
+            <tr><td align="left">- frente: NodoTurno</td></tr>
+            <tr><td align="left">- fin: NodoTurno</td></tr>
+            <tr><td align="left">- tamanio: int</td></tr><hr/>
+            <tr><td align="left">+ encolar(t: Turno): void</td></tr>
+            <tr><td align="left">+ desencolar(): Turno</td></tr>
+            <tr><td align="left">+ verPrimero(): Turno</td></tr>
+            <tr><td align="left">+ cancelar(numero: int): Turno</td></tr>
+            <tr><td align="left">+ buscar(numero) / contieneCliente(cod)</td></tr>
+            <tr><td align="left">+ recorrer(): List&lt;Turno&gt; / mostrar(): String</td></tr>
+            <tr><td align="left">+ estaVacia(): boolean</td></tr></table>>];
+        NodoTurno [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="white">
+            <tr><td><b>NodoTurno</b></td></tr><hr/>
+            <tr><td align="left">- turno: Turno</td></tr>
+            <tr><td align="left">- siguiente: NodoTurno</td></tr></table>>];
+        ArbolClientes [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="white">
+            <tr><td><b>ArbolClientes</b> (BST)</td></tr><hr/>
+            <tr><td align="left">- raiz: NodoCliente</td></tr>
+            <tr><td align="left">- tamanio: int</td></tr><hr/>
+            <tr><td align="left">+ insertar(c: Cliente): void  (recursivo)</td></tr>
+            <tr><td align="left">+ buscar(codigo: int): Cliente  (recursivo)</td></tr>
+            <tr><td align="left">+ inorden(): List&lt;Cliente&gt;  (recursivo)</td></tr>
+            <tr><td align="left">+ actualizar(c: Cliente): void</td></tr>
+            <tr><td align="left">+ altura(): int</td></tr></table>>];
+        NodoCliente [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="white">
+            <tr><td><b>NodoCliente</b></td></tr><hr/>
+            <tr><td align="left">- cliente: Cliente</td></tr>
+            <tr><td align="left">- izquierdo: NodoCliente</td></tr>
+            <tr><td align="left">- derecho: NodoCliente</td></tr></table>>];
+    }
+
+    subgraph cluster_datos {
+        label="datos (acceso a datos - JDBC / SQLite)"; style="rounded,filled"; fillcolor="#f4efff"; color="#9d86d6";
+        ClienteDAO [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="white">
+            <tr><td><i>&lt;&lt;interface&gt;&gt;</i><br/><b>ClienteDAO</b></td></tr><hr/>
+            <tr><td align="left">+ insertar / actualizar / cambiarEstado</td></tr>
+            <tr><td align="left">+ buscarPorCodigo / listarTodos</td></tr></table>>];
+        ServicioDAO [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="white">
+            <tr><td><i>&lt;&lt;interface&gt;&gt;</i><br/><b>ServicioDAO</b></td></tr><hr/>
+            <tr><td align="left">+ insertar / actualizar / cambiarEstado</td></tr>
+            <tr><td align="left">+ buscarPorCodigo / listarTodos</td></tr></table>>];
+        TurnoDAO [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="white">
+            <tr><td><i>&lt;&lt;interface&gt;&gt;</i><br/><b>TurnoDAO</b></td></tr><hr/>
+            <tr><td align="left">+ insertar / marcarAtendido / marcarCancelado</td></tr>
+            <tr><td align="left">+ buscarPorNumero / listarPorEstado / listarPorCliente</td></tr>
+            <tr><td align="left">+ contarPendientesPorCliente / ...PorServicio</td></tr>
+            <tr><td align="left">+ resumenPorServicio()</td></tr></table>>];
+        ClienteDAOSQLite [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="white"><tr><td><b>ClienteDAOSQLite</b></td></tr></table>>];
+        ServicioDAOSQLite [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="white"><tr><td><b>ServicioDAOSQLite</b></td></tr></table>>];
+        TurnoDAOSQLite [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="white"><tr><td><b>TurnoDAOSQLite</b></td></tr></table>>];
+        ConexionSQLite [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="white">
+            <tr><td><b>ConexionSQLite</b></td></tr><hr/>
+            <tr><td align="left">- rutaBaseDatos: Path  (data/turnos.db)</td></tr><hr/>
+            <tr><td align="left">+ abrir(): Connection  (PRAGMA foreign_keys=ON)</td></tr></table>>];
+        InicializadorBD [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="white">
+            <tr><td><b>InicializadorBD</b></td></tr><hr/>
+            <tr><td align="left">+ inicializar(): boolean</td></tr></table>>];
+        AccesoDatosException [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="white">
+            <tr><td><b>AccesoDatosException</b></td></tr><hr/>
+            <tr><td align="left">extends RuntimeException</td></tr></table>>];
+    }
+
+    subgraph cluster_modelo {
+        label="modelo (M)"; style="rounded,filled"; fillcolor="#f5f5f5"; color="#999999";
+        Cliente [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="white">
+            <tr><td><b>Cliente</b></td></tr><hr/>
+            <tr><td align="left">- codigo: int {final}</td></tr>
+            <tr><td align="left">- nombre: String</td></tr>
+            <tr><td align="left">- telefono: String</td></tr>
+            <tr><td align="left">- activo: boolean</td></tr></table>>];
+        Servicio [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="white">
+            <tr><td><b>Servicio</b></td></tr><hr/>
+            <tr><td align="left">- codigo: int {final}</td></tr>
+            <tr><td align="left">- nombre: String</td></tr>
+            <tr><td align="left">- activo: boolean</td></tr></table>>];
+        Turno [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="white">
+            <tr><td><b>Turno</b></td></tr><hr/>
+            <tr><td align="left">- numero: int {final}</td></tr>
+            <tr><td align="left">- codigoCliente: int</td></tr>
+            <tr><td align="left">- codigoServicio: int</td></tr>
+            <tr><td align="left">- fechaGeneracion: LocalDateTime</td></tr>
+            <tr><td align="left">- estado: EstadoTurno</td></tr>
+            <tr><td align="left">- fechaAtencion / fechaCancelacion</td></tr><hr/>
+            <tr><td align="left">+ marcarAtendido(f) / marcarCancelado(f)</td></tr></table>>];
+        EstadoTurno [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="white">
+            <tr><td><i>&lt;&lt;enum&gt;&gt;</i><br/><b>EstadoTurno</b></td></tr><hr/>
+            <tr><td align="left">PENDIENTE<br align="left"/>ATENDIDO<br align="left"/>CANCELADO<br align="left"/></td></tr></table>>];
+        ResumenServicio [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="white">
+            <tr><td><i>&lt;&lt;record&gt;&gt;</i><br/><b>ResumenServicio</b></td></tr></table>>];
+        TurnoDetalle [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="white">
+            <tr><td><i>&lt;&lt;record&gt;&gt;</i><br/><b>TurnoDetalle</b></td></tr></table>>];
+    }
+
+    // Herencia (vista)
+    edge [arrowhead=empty, style=solid];
+    MenuPrincipal -> MenuBase; VistaClientes -> MenuBase; VistaServicios -> MenuBase; VistaTurnos -> MenuBase;
+
+    // Realizacion de interfaces
+    edge [arrowhead=empty, style=dashed];
+    ClienteDAOSQLite -> ClienteDAO; ServicioDAOSQLite -> ServicioDAO; TurnoDAOSQLite -> TurnoDAO;
+
+    // Composicion en estructuras
+    edge [arrowhead=none, arrowtail=diamond, dir=back, style=solid];
+    ColaTurnos -> NodoTurno [xlabel="0..*"];
+    ArbolClientes -> NodoCliente [xlabel="0..*"];
+
+    // Asociaciones
+    edge [arrowhead=vee, arrowtail=none, dir=forward, style=solid];
+    MenuPrincipal -> VistaClientes; MenuPrincipal -> VistaServicios; MenuPrincipal -> VistaTurnos;
+    MenuBase -> EntradaConsola;
+    VistaClientes -> GestorClientes; VistaServicios -> GestorServicios;
+    VistaTurnos -> GestorTurnos; VistaTurnos -> GestorReportes;
+    GestorClientes -> ArbolClientes; GestorClientes -> ClienteDAO;
+    GestorServicios -> ServicioDAO;
+    GestorTurnos -> ColaTurnos; GestorTurnos -> TurnoDAO; GestorTurnos -> GestorClientes; GestorTurnos -> GestorServicios;
+    GestorReportes -> TurnoDAO;
+    NodoTurno -> Turno; NodoCliente -> Cliente;
+    Turno -> EstadoTurno;
+    ClienteDAOSQLite -> ConexionSQLite; ServicioDAOSQLite -> ConexionSQLite; TurnoDAOSQLite -> ConexionSQLite; InicializadorBD -> ConexionSQLite;
+
+    // Dependencias
+    edge [arrowhead=vee, style=dashed];
+    Main -> MenuPrincipal [xlabel="&lt;&lt;crea&gt;&gt;"];
+    GestorClientes -> Validador; GestorServicios -> Validador;
+    Validador -> ReglaNegocioException [xlabel="&lt;&lt;lanza&gt;&gt;"];
+    ConexionSQLite -> AccesoDatosException [style=invis];
+    VistaTurnos -> Pantalla;
+    GestorReportes -> TurnoDetalle; TurnoDAO -> ResumenServicio;
+    ClienteDAO -> Cliente; ServicioDAO -> Servicio; TurnoDAO -> Turno;
+}
